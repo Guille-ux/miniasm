@@ -36,4 +36,17 @@ int resizeStream(ByteStream *stream, size_t needed) {
 	return 0;
 }
 
+int streamAppendByte(ByteStream *stream, uint8_t byte) {
+	if (resizeStream(stream, 1) != 0) return -1;
+	stream->data[size++]=byte;
+	return 0;
+}
+
+int streamAppendBytes(ByteStream *stream, uint8_t *bytes, size_t n) {
+	if (resizeStream(stream, n)!=0 || bytes==NULL || n==0) return -1;
+	memcpy(&stream->data[size], bytes, n);
+	stream->size+=n;
+	return 0;
+}
+
 

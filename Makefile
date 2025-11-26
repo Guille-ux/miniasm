@@ -4,10 +4,23 @@ CC = gcc
 ASM = nasm
 AR = ar
 ARFLAGS = rcs
-CFLAGS = # Las banderas para GCC 
+CFLAGS = -c # Las banderas para GCC 
 
-miniasm.o: src/miniasm.c
-	$(CC) $(CFLAGS) -o miniasm.o src/miniasm.c
+SRC = src
+BUILD = build
 
-stream.o: src/stream.c
-	$(CC) $(CFLAGS) -o stream.o src/stream.c
+$(BUILD)/miniasm.o: $(SRC)/miniasm.c
+	$(CC) $(CFLAGS) -o $(BUILD)/miniasm.o $(SRC)/miniasm.c
+
+$(BUILD)/stream.o: $(SRC)/stream.c
+	$(CC) $(CFLAGS) -o $(BUILD)/stream.o $(SRC)/stream.c
+
+$(BUILD)/utils.o: $(SRC)/utils.c
+	$(CC) $(CFLAGS) -o $(BUILD)/utils.o $(SRC)/utils.c
+
+.PHONY: clean all
+
+clean:
+	rm -rf $(BUILD)/*
+
+all:
