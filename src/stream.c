@@ -18,18 +18,22 @@ int freeStream(ByteStream *stream) {
 	return 0;
 }
 
-int resizeStream(ByteStream *stream) {
+int resizeStream(ByteStream *stream, size_t needed) {
 	if (stream==NULL || stream->data==NULL) return -1;
-	if (stream->size < stream->cap) return 0;
+	
+	while (1) {
+		if (stream->size+needed < stream->cap) break;
+		size_t newSize = stream->cap*STREAM_BUFFER_GROW_FACTOR;
 
-	size_t newSize = stream->cap*STREAM_BUFFER_GROW_FACTOR;
-
-	uint8_t *tmp_buffer = (uint8_t*)malloc(newSize);
-	memset(tmp_buffer, 0, newSize)
-	memcpy(tmp_buffer, stream->data, stream->size);
-	free(stream->data);
-	stream->data=tmp_buffer;
-	stream->cap = newSize;
-
+		uint8_t *tmp_buffer = (uint8_t*)malloc(newSize);
+		memset(tmp_buffer, 0, newSize)
+		memcpy(tmp_buffer, stream->data, stream->size);
+		free(stream->data);
+		stream->data=tmp_buffer;
+		stream->cap = newSize;
+	}
+	
 	return 0;
 }
+
+

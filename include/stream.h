@@ -21,6 +21,7 @@ typedef struct {
 
 int initStream(ByteStream *stream); // se encargara de asignar memoria para los datos 
 int freeStream(ByteStream *stream); // para liberar el stream
-int resizeStream(ByteStream *stream); // para la gestión del tamaño
+int resizeStream(ByteStream *stream, int needed); // para la gestión del tamaño
+int streamAppendByte(ByteStream *stream)
 
 #endif
