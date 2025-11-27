@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "stream.h"
 
-bool assembly_text(ByteStream *outStream, const char *text);
+bool assemble_text(ByteStream *outStream, const char *text);
 
 /*
  * Mapeo de Registros para x86-32

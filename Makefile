@@ -24,9 +24,24 @@ $(BUILD)/data_asm.o: $(SRC)/data_asm.c
 $(BUILD)/directives.o: $(SRC)/directives.c
 	$(CC) $(CFLAGS) -o $(BUILD)/directives.o $(SRC)/directives.c
 
-.PHONY: clean all
+$(BUILD)/libminiasm.a: all
+	$(AR) $(ARFLAGS) $(BUILD)/libminiasm.o $(BUILD)/*.o
+
+$(BUILD)/test.o: $(SRC)/test.c
+	$(CC) $(CFLAGS) -o $(BUILD)/test.o $(SRC)/test.c
+
+.PHONY: clean all lib test run_test
 
 clean:
 	rm -rf $(BUILD)/*
+
+lib: $(BUILD)/libminiasm.a
+
+test: $(BUILD)/test.o all
+	$(CC) -o $(BUILD)/test $(BUILD)/*.o
+
+run_test: test
+	@echo "Running Test..."
+	./$(BUILD)/test
 
 all: $(BUILD)/data_asm.o $(BUILD)/directives.o $(BUILD)/utils.o $(BUILD)/miniasm.o  $(BUILD)/stream.o
