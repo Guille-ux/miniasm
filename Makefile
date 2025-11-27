@@ -18,9 +18,15 @@ $(BUILD)/stream.o: $(SRC)/stream.c
 $(BUILD)/utils.o: $(SRC)/utils.c
 	$(CC) $(CFLAGS) -o $(BUILD)/utils.o $(SRC)/utils.c
 
+$(BUILD)/data_asm.o: $(SRC)/data_asm.c
+	$(CC) $(CFLAGS) -o $(BUILD)/data_asm.o $(SRC)/data_asm.c
+
+$(BUILD)/directives.o: $(SRC)/directives.c
+	$(CC) $(CFLAGS) -o $(BUILD)/directives.o $(SRC)/directives.c
+
 .PHONY: clean all
 
 clean:
 	rm -rf $(BUILD)/*
 
-all:
+all: $(BUILD)/data_asm.o $(BUILD)/directives.o $(BUILD)/utils.o $(BUILD)/miniasm.o  $(BUILD)/stream.o
