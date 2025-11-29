@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+size_t getNum(const char *string, int *pos);
 size_t atob(const char *string, int *pos); // la usare para convertir binario
 
 #endif

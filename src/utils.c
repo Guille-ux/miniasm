@@ -1,6 +1,8 @@
 #include "../include/utils.h"
 #include <stdint.h>
 #include <stddef.h>
+#include "../include/directives.h"
+
 
 size_t atob(const char *string, int *pos) {
 	size_t bin = 0;
@@ -14,4 +16,14 @@ size_t atob(const char *string, int *pos) {
 	bin >>= 1;
 	*pos+=z;
 	return bin;
+}
+
+size_t getNum(const char *string, int *pos) {
+	*pos+=2;
+	size_t val;
+	if (isPattern(string, "0b")) {
+		val = atob(&string[*pos], pos);
+	}
+
+	return val;
 }

@@ -5,7 +5,7 @@
 int main() {
 	ByteStream stream;
 	
-	assemble_text(&stream, "db b00000101");
+	assemble_text(&stream, "db 0b00000101");
 
 	printf("Data: %d", (uint8_t)*stream.data);
 

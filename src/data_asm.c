@@ -22,9 +22,7 @@ void assemble_db(size_t value, ByteStream *stream) {
 void handle_data_directive(ByteStream *stream, directive dir, const char *data, int *pos) {	
 	size_t val=0;
 
-	if (data[0]=='b') {
-		val = atob(&data[1], pos);
-	}
+	val = getNum(data, pos);
 	
 	switch (dir) {
 		case DIRECTIVE_DB: assemble_db(val, stream); break;

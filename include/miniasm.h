@@ -5,6 +5,7 @@
 #include "stream.h"
 
 bool assemble_text(ByteStream *outStream, const char *text);
+uint8_t assemble_reg(const char *text, int *pos, char *arch);
 
 /*
  * Mapeo de Registros para x86-32

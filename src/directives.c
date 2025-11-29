@@ -23,6 +23,18 @@ directive WtfDirectiveIs(const char *string, int *pos) {
 	} else if (isPattern(string, "dd ")) {
 		*pos+=3;
 		return DIRECTIVE_DD;
+	} else if (isPattern(string, "x86mov ")) {
+		*pos+=7;
+		return DIRECTIVE_MOVI;
+	} else if (isPattern(string, ".label ")) {
+		*pos+=7;
+		return DIRECTIVE_LABEL;
+	} else if (isPattern(string, "%times size ")) {
+		*pos+=12;
+		return DIRECTIVE_TIMES_SIZE;
+	} else if (isPattern(string, "%times ")) {
+		*pos+=7;
+		return DIRECTIVE_TIMES;
 	}
 
 	return DIRECTIVE_NULL;
