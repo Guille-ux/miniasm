@@ -51,7 +51,7 @@ bool assemble_text(ByteStream *outStream, const char *text) {
 					}
 
 					pos++;
-					if (text[pos]='0') {
+					if (text[pos]=='0') {
 						size_t number=getNum(&text[pos]);
 						if (arch==8) {
 							opcode=0xB0+a_reg_code;
