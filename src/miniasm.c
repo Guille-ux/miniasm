@@ -5,6 +5,43 @@
 #include "../include/data_asm.h"
 #include "../include/directives.h"
 
+void skipUntilThese(const char *text, int *pos, const char *list) {
+	while (1) {
+		for (char *ch=list;ch!='\0';*ch++) {
+			if (*ch==text[pos]) {
+				return;
+			}
+		}
+
+		if (text[pos]=='\0') {
+			break;
+		}
+
+		*pos++;
+	}
+}
+
+void skipThese(const char *text, int *pos, const char *list) {
+	bool found=false;
+
+	while (1) {
+		found=false;
+		for (char *ch=list;ch!='\0';*ch++) {
+			if (*ch==text[pos]) {
+				found=true;
+				break;
+			}
+		}
+		if (found==false) {
+			break;
+		}
+		if (text[pos]=='\0') {
+			break;
+		}
+		*pos++;
+	}	
+}
+
 bool assemble_text(ByteStream *outStream, const char *text) {
 	if (outStream == NULL) return false;
 
@@ -38,19 +75,70 @@ bool assemble_text(ByteStream *outStream, const char *text) {
 				handle_data_directive(outStream, cdir, &text[pos], &pos);
 				break;
 			case DIRECTIVE_MOVI:
-				if (text[pos]=='[') {
-					// is to memory
+				if (text[pos]=='M' || text[pos]=='N' || text[pos]=='L') {
+					char arch;
+					uint8_t opcode;
+					char ch=text[pos++];
+	
+					uint8_t a_reg_code = assemble_reg(&text[pos], &pos, &arch);					
+
+					uint8_t modrm = 0;
+					bool offset32=false;
+					bool offset8=false;
+
+					if (arch==8) {
+						opcode = 0x88;
+					} else if (arch=16) {
+						streamAppendByte(outStream, 0x66);
+						opcode = 0x89;
+					} else {
+						opcode = 0x89;
+					}	
+
+					if (ch=='M') {
+						// nothing
+					} else if (ch=='N') {
+						skipThese(&text[pos], &pos, " \t");
+						modrm = 1 << 6;
+						offset8=true;
+					} else if (ch=='L') {
+						skipThese(&text[pos], &pos, " \t");
+						modrm = 2 << 6;
+						offset32=true;
+					}
+					if (offset8 || offset32) {
+						skipThese(&text[pos], &pos, " \t");	
+						if (&text[pos++]!='+') break; // Error 
+						skipThese(&text[pos], &pos, " \t");
+						size_t n=getNum(&text[pos], &pos);	
+					}
+
+					
+
+
+					b_reg_code = assemble_reg(&text[pos], &pos, &arch);
+					modrm |= b_reg_code << 3;
+					modrm |= a_reg_code;
+
+					if (offset8) {
+						streamAppendByte(outStream, n & 0xFF);
+					} else if (offset32) {
+						for (int i=0;i<4;i++) {
+							streamAppendByte(outStream, (n >> i*8) & 0xFF);
+						}
+					}
 				} else {
 					// is to a reg
 					char arch;
 					uint8_t opcode;
 					uint8_t a_reg_code = assemble_reg(&text[pos], &pos, &arch);
-					if (&(text[pos++]!=',')) {
+					if (text[pos++]!=',') {
 						break;
 						// Error!
 					}
 
-					pos++;
+					skipThese(text, &pos, " \t");
+
 					if (text[pos]=='0') {
 						size_t number=getNum(&text[pos]);
 						if (arch==8) {
@@ -82,10 +170,50 @@ bool assemble_text(ByteStream *outStream, const char *text) {
 						} else {
 							opcode = 0x89;
 						}
+
+						uint8_t modrm=0;
+
+						bool offset8 = false;
+						bool offset32 = false;
+
+						if (text[pos]=='M') {
+							opcode += 2;
+							pos++;
+						} else if (text[pos]=='N') {
+							pos++;
+							opcode += 2;
+							offset8 = true;
+							modrm = 1 << 6;
+						} else if (text[pos]=='L') {
+							pos++;
+							opcode += 2;
+							offset32=true;
+							modrm = 2 << 6;
+						} else {
+							modrm = 3 << 6;	
+						}
 						streamAppenByte(outStream, opcode);
 
-						uint8_t modrm;
+						
+						modrm |= a_reg_code << 3;
+						uint8_t b_reg_code = assemble_reg(text[pos], &pos, &arch);
+						modrm |= b_reg_code;
 
+						streamAppendByte(outStream, modrm);
+						if (offset8 || offset32) {
+							skipThese(&text[pos], &pos, " \t");
+							if (text[pos]!='+') break; // Error
+							skipThese(&text[pos], &pos, " \t");
+							size_t n = getNum(&text[pos], &pos);
+						}
+
+						if (offset8) {
+							streamAppendByte(outStream, n & 0xFF);
+						} else if (offset32) {
+							for (int i=0;i<4;i++) {
+								streamAppendByte(outStream, (n >> i*8) & 0xFF);
+							}
+						}
 					}
 				}
 				break;

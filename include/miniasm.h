@@ -6,6 +6,8 @@
 
 bool assemble_text(ByteStream *outStream, const char *text);
 uint8_t assemble_reg(const char *text, int *pos, char *arch);
+void skipUntilThese(const char *text, int *pos, const char *list);
+void skipThese(const char *text, int *pos, const char *list);
 
 /*
  * Mapeo de Registros para x86-32
