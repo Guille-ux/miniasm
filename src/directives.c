@@ -26,6 +26,9 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "mov ")) {
 		*pos+=4;
 		return DIRECTIVE_MOVI;
+	} else if (isPattern(string, "cmp ")) {
+		*pos+=4;
+		return DIRECTIVE_CMP;
 	} else if (isPattern(string, ".label ")) {
 		*pos+=7;
 		return DIRECTIVE_LABEL;

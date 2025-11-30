@@ -266,22 +266,25 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 				modrm_placeholder(0x01, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_ADC:
-				modrm_placeholder(0x09, stream, &text[pos], &pos);	
+				modrm_placeholder(0x11, stream, &text[pos], &pos);	
 				break;
 			case DIRECTIVE_SUB:
-				modrm_placeholder(0x11, stream, &text[pos], &pos);
+				modrm_placeholder(0x29, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_OR:
-				modrm_placeholder(0x19, stream, &text[pos], &pos);
+				modrm_placeholder(0x09, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_AND:
 				modrm_placeholder(0x21, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_SBB:
-				modrm_placeholder(0x29, stream, &text[pos], &pos);
+				modrm_placeholder(0x19, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_XOR:
 				modrm_placeholder(0x31, stream, &text[pos], &pos);
+				break;
+			case DIRECTIVE_CMP:
+				modrm_placeholder(0x39, stream, &text[pos], &pos);
 				break;
 			case DIRECTIVE_TIMES:	
 				break;
