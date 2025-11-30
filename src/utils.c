@@ -4,7 +4,7 @@
 #include "../include/directives.h"
 
 
-size_t atob(const char *string, int *pos) {
+size_t atob(const char *string, size_t *pos) {
 	size_t bin = 0;
 	char *ch = string;
 	int z=0;
@@ -18,7 +18,7 @@ size_t atob(const char *string, int *pos) {
 	return bin;
 }
 
-size_t getNum(const char *string, int *pos) {
+size_t getNum(const char *string, size_t *pos) {
 	*pos+=2;
 	size_t val;
 	if (isPattern(string, "0b")) {

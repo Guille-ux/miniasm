@@ -3,11 +3,13 @@
 
 #include <stdbool.h>
 #include "stream.h"
+#include "link.h"
 
-bool assemble_text(ByteStream *outStream, const char *text);
-uint8_t assemble_reg(const char *text, int *pos, char *arch);
-void skipUntilThese(const char *text, int *pos, const char *list);
-void skipThese(const char *text, int *pos, const char *list);
+bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table);
+uint8_t assemble_reg(char *text, size_t *pos, char *arch);
+void skipUntilThese(char *text, size_t *pos, const char *list);
+void skipThese(char *text, size_t *pos, const char *list);
+void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *pos);
 
 /*
  * Mapeo de Registros para x86-32

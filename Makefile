@@ -25,10 +25,13 @@ $(BUILD)/directives.o: $(SRC)/directives.c
 	$(CC) $(CFLAGS) -o $(BUILD)/directives.o $(SRC)/directives.c
 
 $(BUILD)/libminiasm.a: all
-	$(AR) $(ARFLAGS) $(BUILD)/libminiasm.o $(BUILD)/*.o
+	$(AR) $(ARFLAGS) $(BUILD)/libminiasm.o $(BUILD)/directives.o $(BUILD)/data_asm.o $(BUILD)/utils.o $(BUILD)/miniasm.o $(BUILD)/stream.o $(BUILD)/link.o
 
 $(BUILD)/test.o: $(SRC)/test.c
 	$(CC) $(CFLAGS) -o $(BUILD)/test.o $(SRC)/test.c
+
+$(BUILD)/link.o: $(SRC)/link.c
+	$(CC) $(CFLAGS) -o $(BUILD)/link.o $(SRC)/link.c
 
 .PHONY: clean all lib test run_test
 
@@ -44,4 +47,4 @@ run_test: test
 	@echo "Running Test..."
 	./$(BUILD)/test
 
-all: $(BUILD)/data_asm.o $(BUILD)/directives.o $(BUILD)/utils.o $(BUILD)/miniasm.o  $(BUILD)/stream.o
+all: $(BUILD)/data_asm.o $(BUILD)/directives.o $(BUILD)/utils.o $(BUILD)/miniasm.o  $(BUILD)/stream.o $(BUILD)/link.o

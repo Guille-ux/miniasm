@@ -19,7 +19,7 @@ void assemble_db(size_t value, ByteStream *stream) {
 	streamAppendByte(stream, ((uint8_t)value) & 0xFF);
 }
 
-void handle_data_directive(ByteStream *stream, directive dir, const char *data, int *pos) {	
+void handle_data_directive(ByteStream *stream, directive dir, const char *data, size_t *pos) {	
 	size_t val=0;
 
 	val = getNum(data, pos);
