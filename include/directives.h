@@ -21,6 +21,10 @@ typedef enum {
 	DIRECTIVE_SBB,
 	DIRECTIVE_XOR,
 	DIRECTIVE_CMP,
+	DIRECTIVE_MUL,
+	DIRECTIVE_IMUL,
+	DIRECTIVE_DIV,
+	DIRECTIVE_IDIV,
 } directive;
 
 directive WtfDirectiveIs(const char *string, size_t *pos);

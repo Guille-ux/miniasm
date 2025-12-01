@@ -116,19 +116,19 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 					if (ch=='M') {
 						// nothing
 					} else if (ch=='N') {
-						skipThese(&text[pos], &pos, " \t");
+						skipThese(text, &pos, " \t");
 						modrm = 1 << 6;
 						offset8=true;
 					} else if (ch=='L') {
-						skipThese(&text[pos], &pos, " \t");
+						skipThese(text, &pos, " \t");
 						modrm = 2 << 6;
 						offset32=true;
 					}
 					
 					if (offset8 || offset32) {
-						skipThese(&text[pos], &pos, " \t");	
+						skipThese(text, &pos, " \t");	
 						if (text[pos++]!='+') break; // Error 
-						skipThese(&text[pos], &pos, " \t");
+						skipThese(text, &pos, " \t");
 						n=getNum(&text[pos], &pos);	
 					}
 
@@ -220,9 +220,9 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 
 						streamAppendByte(outStream, modrm);
 						if (offset8 || offset32) {
-							skipThese(&text[pos], &pos, " \t");
+							skipThese(text, &pos, " \t");
 							if (text[pos]!='+') break; // Error
-							skipThese(&text[pos], &pos, " \t");
+							skipThese(text, &pos, " \t");
 							size_t n = getNum(&text[pos], &pos);
 						}
 
@@ -239,7 +239,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_LABEL:
 				for (int i=0;i<rel_count;i++) {
 					size_t start_pos=pos;
-					skipUntilThese(&text[pos], &pos, ":");
+					skipUntilThese(text, &pos, ":");
 					
 					if (isPattern(&text[start_pos], rel[i].name)) {
 						rel[i].direction = outStream->size;
@@ -251,7 +251,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_LABELDEF:
 				RelocationSymbol *crel = &rel[rel_count++];
 				size_t start_pos = pos;
-				skipUntilThese(&text[start_pos], &pos, ":");
+				skipUntilThese(text, &pos, ":");
 				char tmp = text[pos];
 				text[pos]='\0';
 				
@@ -263,25 +263,25 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 				
 				break;
 			case DIRECTIVE_ADD:
-				modrm_placeholder(0x01, stream, &text[pos], &pos);
+				modrm_placeholder(0x01, stream, text, &pos);
 				break;
 			case DIRECTIVE_ADC:
-				modrm_placeholder(0x11, stream, &text[pos], &pos);	
+				modrm_placeholder(0x11, stream, text, &pos);	
 				break;
 			case DIRECTIVE_SUB:
-				modrm_placeholder(0x29, stream, &text[pos], &pos);
+				modrm_placeholder(0x29, stream, text, &pos);
 				break;
 			case DIRECTIVE_OR:
-				modrm_placeholder(0x09, stream, &text[pos], &pos);
+				modrm_placeholder(0x09, stream, text, &pos);
 				break;
 			case DIRECTIVE_AND:
-				modrm_placeholder(0x21, stream, &text[pos], &pos);
+				modrm_placeholder(0x21, stream, text, &pos);
 				break;
 			case DIRECTIVE_SBB:
-				modrm_placeholder(0x19, stream, &text[pos], &pos);
+				modrm_placeholder(0x19, stream, text, &pos);
 				break;
 			case DIRECTIVE_XOR:
-				modrm_placeholder(0x31, stream, &text[pos], &pos);
+				modrm_placeholder(0x31, stream, text, &pos);
 				break;
 			case DIRECTIVE_CMP:
 				modrm_placeholder(0x39, stream, &text[pos], &pos);
@@ -289,6 +289,18 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_TIMES:	
 				break;
 			case DIRECTIVE_TIMES_SIZE:
+				break;
+			case DIRECTIVE_MUL:
+				i_placeholder(4, stream, text, &pos);
+				break;
+			case DIRECTIVE_IMUL:
+				i_placeholder(5, stream, text, &pos);
+				break;
+			case DIRECTIVE_DIV:
+				i_placeholder(6, stream, text, &pos);
+				break;
+			case DIRECTIVE_IDIV:
+				i_placeholder(7, stream, text, &pos);
 				break;
 			default: break;
 		}
@@ -388,7 +400,7 @@ uint8_t assemble_reg(char *text, size_t *pos, char *arch) {
 void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *pos) {
 	
 	char arch;
-	uint8_t a_reg_code = assemble_reg(text, pos, &arch);
+	uint8_t a_reg_code = assemble_reg(&text[*pos], pos, &arch);
 	if (arch==16) {
 		streamAppendByte(stream, 0x66);
 	} else if (arch==8) {
@@ -397,9 +409,25 @@ void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *p
 	streamAppendByte(stream, opcode);	
 	*pos++;
 	skipThese(text, pos, " \t");
-	uint8_t b_reg_code = assemble_reg(text, pos, &arch);
+	uint8_t b_reg_code = assemble_reg(&text[*pos], pos, &arch);
 	uint8_t modrm = 3 << 6;
 	modrm |= a_reg_code << 3;
 	modrm |= b_reg_code;
 	streamAppendByte(stream, modrm);
+}
+
+void i_placeholder(uint8_t extender, ByteStream *stream, char *text, size_t *pos) {
+	char arch;
+	uint8_t opcode = 0xF7;
+	uint8_t a_reg_code = assemble_reg(&text[*pos], pos, &arch);
+	if (arch==16) {
+		streamAppendByte(stream, 0x66);
+	} else if (arch==8) {
+		opcode--;
+	}
+	streamAppendByte(stream, opcode);	
+	uint8_t modrm = 3 << 6;
+	modrm |= extender << 3;
+	modrm |= a_reg_code;
+	streamAppendByte(stream, modrm);		
 }
