@@ -6,6 +6,8 @@
 #include "../include/directives.h"
 #include "../include/link.h"
 
+#define DEFAULT_ARCH 32
+
 void skipUntilThese(char *text, size_t *pos, const char *list) {
 	while (1) {
 		for (char *ch=list;ch!='\0';*ch++) {
@@ -106,7 +108,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 
 					if (arch==8) {
 						opcode = 0x88;
-					} else if (arch=16) {
+					} else if (arch!=DEFAULT_ARCH) {
 						streamAppendByte(outStream, 0x66);
 						opcode = 0x89;
 					} else {
@@ -164,7 +166,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 							opcode=0xB0+a_reg_code;
 							streamAppendByte(outStream, opcode);
 							streamAppendByte(outStream, number & 0xFF);
-						} else if (arch==16) {
+						} else if (arch!=DEFAULT_ARCH) {
 							streamAppendByte(outStream, 0x66);
 							opcode=0xB8+a_reg_code;
 							streamAppendByte(outStream, opcode);
@@ -183,7 +185,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 									
 						if (arch==8) {
 							opcode = 0x88;
-						} else if (arch==16){
+						} else if (arch!=DEFAULT_ARCH){
 							streamAppendByte(outStream, 0x66);
 							opcode = 0x89;
 						} else {
@@ -284,7 +286,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 				modrm_placeholder(0x31, stream, text, &pos);
 				break;
 			case DIRECTIVE_CMP:
-				modrm_placeholder(0x39, stream, &text[pos], &pos);
+				modrm_placeholder(0x39, stream, text, &pos);
 				break;
 			case DIRECTIVE_TIMES:	
 				break;
@@ -401,10 +403,10 @@ void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *p
 	
 	char arch;
 	uint8_t a_reg_code = assemble_reg(&text[*pos], pos, &arch);
-	if (arch==16) {
-		streamAppendByte(stream, 0x66);
-	} else if (arch==8) {
+	if (arch==8) {
 		opcode--;
+	} else if (arch!=DEFAULT_ARCH) {
+		streamAppendByte(stream, 0x66);
 	}
 	streamAppendByte(stream, opcode);	
 	*pos++;
@@ -420,10 +422,10 @@ void i_placeholder(uint8_t extender, ByteStream *stream, char *text, size_t *pos
 	char arch;
 	uint8_t opcode = 0xF7;
 	uint8_t a_reg_code = assemble_reg(&text[*pos], pos, &arch);
-	if (arch==16) {
-		streamAppendByte(stream, 0x66);
-	} else if (arch==8) {
+	if (arch==8) {
 		opcode--;
+	} else if (arch!=DEFAULT_ARCH) {
+		streamAppendByte(stream, 0x66);
 	}
 	streamAppendByte(stream, opcode);	
 	uint8_t modrm = 3 << 6;
