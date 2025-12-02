@@ -74,6 +74,15 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "idiv ")) {
 		*pos+=5;
 		return DIRECTIVE_IDIV;
+	} else if (isPattern(string, "shl ")) {
+		*pos+=4;
+		return DIRECTIVE_SHL;
+	} else if (isPattern(string, "shr ")) {
+		*pos+=4;
+		return DIRECTIVE_SHR;
+	} else if (isPattern(string, "sar ")) {
+		*pos+=4;
+		return DIRECTIVE_SAR;
 	}
 
 	return DIRECTIVE_NULL;

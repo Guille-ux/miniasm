@@ -25,6 +25,9 @@ typedef enum {
 	DIRECTIVE_IMUL,
 	DIRECTIVE_DIV,
 	DIRECTIVE_IDIV,
+	DIRECTIVE_SHL,
+	DIRECTIVE_SHR,
+	DIRECTIVE_SAR,
 } directive;
 
 directive WtfDirectiveIs(const char *string, size_t *pos);

@@ -11,6 +11,7 @@ void skipUntilThese(char *text, size_t *pos, const char *list);
 void skipThese(char *text, size_t *pos, const char *list);
 void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *pos);
 void i_placeholder(uint8_t extender, ByteStream *stream, char *text, size_t *pos);
+void shift_placeholder(uint8_t extender, uint8_t opcode, ByteStream *stream, char *text, size_t *pos);
 
 /*
  * Mapeo de Registros para x86-32
