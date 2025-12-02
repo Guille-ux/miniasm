@@ -83,6 +83,18 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "sar ")) {
 		*pos+=4;
 		return DIRECTIVE_SAR;
+	} else if (isPattern(string, "rol ")) {
+		*pos+=4;
+		return DIRECTIVE_ROL;
+	} else if (isPattern(string, "ror ")) {
+		*pos+=4;
+		return DIRECTIVE_ROR;
+	} else if (isPattern(string, "not ")) {
+		*pos+=4;
+		return DIRECTIVE_NOT;
+	} else if (isPattern(string, "neg ")) {
+		*pos+=4;
+		return DIRECTIVE_NEG;
 	}
 
 	return DIRECTIVE_NULL;

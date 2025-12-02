@@ -313,6 +313,18 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_SAR:
 				shift_placeholder(7, 0xC1, outStream, text, &pos);
 				break;
+			case DIRECTIVE_ROL:
+				shift_placeholder(0, 0xC1, outStream, text, &pos);
+				break;
+			case DIRECTIVE_ROR:
+				shift_placeholder(1, 0xC1, outStream, text, &pos);
+				break;
+			case DIRECTIVE_NOT:
+				i_placeholder(2, outStream, text, &pos);
+				break;
+			case DIRECTIVE_NEG:
+				i_placeholder(3, outStream, text, &pos);
+				break;
 			default: break;
 		}
 
