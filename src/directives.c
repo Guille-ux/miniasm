@@ -95,6 +95,18 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "neg ")) {
 		*pos+=4;
 		return DIRECTIVE_NEG;
+	} else if (isPattern(string, "hlt ")) {
+		*pos+=4;
+		return DIRECTIVE_HLT;
+	} else if (isPattern(string, "int ")) {
+		*pos+=4;
+		return DIRECTIVE_INT;
+	} else if (isPattern(string, "sti ")) {
+		*pos+=4;
+		return DIRECTIVE_STI;
+	} else if (isPattern(string, "cli ")) {
+		*pos+=4;
+		return DIRECTIVE_CLI;
 	}
 
 	return DIRECTIVE_NULL;

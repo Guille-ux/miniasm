@@ -6,5 +6,7 @@
 
 size_t getNum(const char *string, size_t *pos);
 size_t atob(const char *string, size_t *pos); // la usare para convertir binario
+size_t atol(const char *string, size_t *pos);
+size_t atoh(const char *string, size_t *pos);
 
 #endif

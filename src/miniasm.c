@@ -325,6 +325,12 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_NEG:
 				i_placeholder(3, outStream, text, &pos);
 				break;
+			case DIRECTIVE_STI:
+				streamAppendByte(outStream, 0xFB);
+				break;
+			case DIRECTIVE_CLI:
+				streamAppendByte(outStream, 0xFA);
+				break;
 			default: break;
 		}
 
