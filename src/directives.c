@@ -95,17 +95,17 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "neg ")) {
 		*pos+=4;
 		return DIRECTIVE_NEG;
-	} else if (isPattern(string, "hlt ")) {
-		*pos+=4;
+	} else if (isPattern(string, "hlt")) {
+		*pos+=3;
 		return DIRECTIVE_HLT;
 	} else if (isPattern(string, "int ")) {
 		*pos+=4;
 		return DIRECTIVE_INT;
-	} else if (isPattern(string, "sti ")) {
-		*pos+=4;
+	} else if (isPattern(string, "sti")) {
+		*pos+=3;
 		return DIRECTIVE_STI;
-	} else if (isPattern(string, "cli ")) {
-		*pos+=4;
+	} else if (isPattern(string, "cli")) {
+		*pos+=3;
 		return DIRECTIVE_CLI;
 	} else if (isPattern(string, "push ")) {
 		*pos+=5;
@@ -113,6 +113,39 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "pop ")) {
 		*pos+=4;
 		return DIRECTIVE_POP;
+	} else if (isPattern(string, "loax ")) {
+		*pos+=5;
+		return DIRECTIVE_LOAX;
+	} else if (isPattern(string, "loax6 ")) {
+		*pos+=6;
+		return DIRECTIVE_LOAX6;
+	} else if (isPattern(string, "loax8  ")) {
+		*pos+=6;
+		return DIRECTIVE_LOAX8;
+	} else if (isPattern(string, "popa")) {
+		*pos+=4;
+		return DIRECTIVE_POPA;
+	} else if (isPattern(string, "pusha")) {
+		*pos+=5;
+		return DIRECTIVE_PUSHA;
+	} else if (isPattern(string, "ret")) {
+		*pos+=3;
+		return DIRECTIVE_RET;
+	} else if (isPattern(string, "iret")) {
+		*pos+=4;
+		return DIRECTIVE_IRET;
+	} else if (isPattern(string, "call ")) {
+		*pos+=5;
+		return DIRECTIVE_CALL;
+	} else if (isPattern(string, "jmp ")) {
+		*pos+=4;
+		return DIRECTIVE_JMP;
+	} else if (isPattern(string, "rjmp ")) {
+		*pos+=5;
+		return DIRECTIVE_RJMP;
+	} else if (isPattern(string, "rcall ")) {
+		*pos+=6;
+		return DIRECTIVE_RCALL;
 	}
 
 	return DIRECTIVE_NULL;

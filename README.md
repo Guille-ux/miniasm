@@ -1,5 +1,3 @@
 # MiniAsm
 
-it's only my assembler for x86-16 and x86-32
-
-## Files
+it's only my assembler for i386, only works with a subset of instructions because it's for personal use.

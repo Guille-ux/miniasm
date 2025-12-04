@@ -44,7 +44,7 @@ void skipThese(char *text, size_t *pos, const char *list) {
 	}	
 }
 
-bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table) {
+bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking) {
 	if (outStream == NULL) return false;
 
 	size_t pos=0;
@@ -59,9 +59,6 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 
 	if(initStream(outStream)!=0) return false;
 
-	for (int i=0;i<4;i++) {
-		streamAppendByte(outStream, 0); // placeholder para indicar donde esta la tabla
-	}
 
 	directive cdir;
 	size_t rel_cap=128;
@@ -354,22 +351,102 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 				}
 				streamAppendByte(outStream, 0x58+reg);
 				break;
+			case DIRECTIVE_LOAX6:
+				if (DEFAULT_ARCH!=16) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xB8+4);
+				size_t start = pos;
+				while (text[pos++]!=':');
+				newRelocationRequest(linking, outStream->size, 2, &text[start], start-pos);
+				streamAppendByte(outStream, 0x00);
+				streamAppendByte(outStream, 0x00);
+				break;
+			case DIRECTIVE_LOAX:
+				if (DEFAULT_ARCH!=32) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xB8+4);
+				size_t start = pos;
+				while (text[pos++]!=':');
+				newRelocationRequest(linking, outStream->size, 4, &text[start], start-pos);
+				for (int i=0;i<4;i++) {
+					streamAppendByte(outStream, 0x00);
+				}
+				break;
+			case DIRECTIVE_LOAX8:
+				streamAppendByte(outStream, 0xB0+4);
+				size_t start = pos;
+				while (text[pos++]!=':');
+				newRelocationRequest(linking, outStream->size, 1, &text[start], start-pos);
+				streamAppendByte(outStream, 0x00);
+				break;
+			case DIRECTIVE_POPA:
+				streamAppendByte(outStream, 0x61);
+				break;
+			case DIRECTIVE_PUSHA:
+				streamAppendByte(outStream, 0x60);
+				break;
+			case DIRECTIVE_RET:
+				streamAppendByte(outStream, 0xC3);
+				break;
+			case DIRECTIVE_IRET:
+				streamAppendByte(outStream, 0xCF);
+				break;
+			case DIRECTIVE_CALL:
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				if (arch!= DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xFF);
+				uint8_t modrm = 3 << 6 | 2 << 3 | reg;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_JMP:
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				if (arch!= DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xFF);
+				uint8_t modrm = 3 << 6 | 4 << 3 | reg;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_RCALL:
+				if (DEFAULT_ARCH==16) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xE8);
+				size_t n = getNum(&text[pos], &pos);
+				for (int i=0;i<4;i++) {
+					streamAppendByte(outStream, (n >> i*8) & 0xFF);
+				}	
+				break;
+			case DIRECTIVE_RJMP:
+				if (DEFAULT_ARCH==16) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xE9);
+				size_t n = getNum(&text[pos], &pos);
+				for (int i=0;i<4;i++) {
+					streamAppendByte(outStream, (n >> i*8) & 0xFF);
+				}
+				break;
 			default: break;
 		}
 
 		skipThese(text, &pos, " \n\t");
 	}
 
-	for (int i=0;i<4;i++) {
-		outStream->data[i]=(outStream->size >> i*8) & 0xFF;
-	}
 	for (int i=0;i<rel_count;i++) {
-		mapRel2Sym(&rel[i], table);
 		free(rel[i].name);
 	}
 	free(rel);
 
-	streamAppendBytes(outStream, (uint8_t*)(table+sizeof(size_t)*2), table->count*sizeof(Symbol));
+	Symbol endSym;
+	endSym.type = SYM_END;
+	streamAppendByte(linking, (uint8_t*)&endSym, sizeof(Symbol));
 
 	return true;
 }
