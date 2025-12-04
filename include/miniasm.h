@@ -5,6 +5,8 @@
 #include "stream.h"
 #include "link.h"
 
+#define DEFAULT_ARCH 32
+
 bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table);
 uint8_t assemble_reg(char *text, size_t *pos, char *arch);
 void skipUntilThese(char *text, size_t *pos, const char *list);

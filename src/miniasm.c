@@ -6,7 +6,6 @@
 #include "../include/directives.h"
 #include "../include/link.h"
 
-#define DEFAULT_ARCH 32
 
 void skipUntilThese(char *text, size_t *pos, const char *list) {
 	while (1) {
@@ -331,10 +330,34 @@ bool assemble_text(ByteStream *outStream, const char *otext, LinkerTable *table)
 			case DIRECTIVE_CLI:
 				streamAppendByte(outStream, 0xFA);
 				break;
+			case DIRECTIVE_HLT:
+				streamAppendByte(outStream, 0xF4);
+				break;
+			case DIRECTIVE_INT:
+				size_t val = getNum(&text[pos], &pos);
+				streamAppendByte(outStream, 0xCD);
+				streamAppendByte(outStream, 0xFF & val);
+				break;
+			case DIRECTIVE_PUSH:
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				if (DEFAULT_ARCH!=arch) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x50+reg);
+				break;
+			case DIRECTIVE_POP:
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				if (DEFAULT_ARCH!=arch) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x58+reg);
+				break;
 			default: break;
 		}
 
-		pos++;
+		skipThese(text, &pos, " \n\t");
 	}
 
 	for (int i=0;i<4;i++) {

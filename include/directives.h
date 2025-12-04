@@ -36,6 +36,8 @@ typedef enum {
 	DIRECTIVE_INT,
 	DIRECTIVE_STI,
 	DIRECTIVE_CLI,
+	DIRECTIVE_PUSH,
+	DIRECTIVE_POP,
 } directive;
 
 directive WtfDirectiveIs(const char *string, size_t *pos);

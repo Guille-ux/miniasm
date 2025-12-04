@@ -107,6 +107,12 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "cli ")) {
 		*pos+=4;
 		return DIRECTIVE_CLI;
+	} else if (isPattern(string, "push ")) {
+		*pos+=5;
+		return DIRECTIVE_PUSH;
+	} else if (isPattern(string, "pop ")) {
+		*pos+=4;
+		return DIRECTIVE_POP;
 	}
 
 	return DIRECTIVE_NULL;
