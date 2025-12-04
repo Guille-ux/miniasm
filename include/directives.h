@@ -49,6 +49,11 @@ typedef enum {
 	DIRECTIVE_JMP,
 	DIRECTIVE_RCALL,
 	DIRECTIVE_RJMP,
+	DIRECTIVE_CMOVZ,
+	DIRECTIVE_CMOVNZ,
+	DIRECTIVE_CMOVC,
+	DIRECTIVE_IN,
+	DIRECTIVE_OUT,
 } directive;
 
 directive WtfDirectiveIs(const char *string, size_t *pos);

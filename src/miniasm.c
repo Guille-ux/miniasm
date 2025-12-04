@@ -433,6 +433,12 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, (n >> i*8) & 0xFF);
 				}
 				break;
+			case DIRECTIVE_CMOVZ:
+				break;
+			case DIRECTIVE_CMOVNZ:
+				break;
+			case DIRECTIVE_CMOVC:
+				break;
 			default: break;
 		}
 

@@ -146,6 +146,21 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "rcall ")) {
 		*pos+=6;
 		return DIRECTIVE_RCALL;
+	} else if (isPattern(string, "cmovc ")) {
+		*pos+=6;
+		return DIRECTIVE_CMOVC;
+	} else if (isPattern(string, "cmovz ")) {
+		*pos+=6;
+		return DIRECTIVE_CMOVZ;
+	} else if (isPattern(string, "cmovnz ")) {
+		*pos+=7;
+		return DIRECTIVE_CMOVNZ;
+	} else if (isPattern(string, "in ")) {
+		*pos+=3;
+		return DIRECTIVE_IN;
+	} else if (isPattern(string, "out ")) {
+		*pos+=4;
+		return DIRECTIVE_OUT;
 	}
 
 	return DIRECTIVE_NULL;
