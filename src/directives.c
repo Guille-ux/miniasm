@@ -161,6 +161,30 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "out ")) {
 		*pos+=4;
 		return DIRECTIVE_OUT;
+	} else if (isPattern(string, "lgdt ")) {
+		*pos+=5;
+		return DIRECTIVE_LGDT;
+	} else if (isPattern(string, "lidt ")) {
+		*pos+=5;
+		return DIRECTIVE_LIDT;
+	} else if (isPattern(string, "far ")) {
+		*pos+=4;
+		return DIRECTIVE_JMP_FAR;
+	} else if (isPattern(string, "far6 ")) {
+		*pos+=5;
+		return DIRECTIVE_JMP_FAR6;
+	} else if (isPattern(string, "movseg ")) {
+		*pos+=7;
+		return DIRECTIVE_MOV_SEG;
+	} else if (isPattern(string, "getseg ")) {
+		*pos+=7;
+		return DIRECTIVE_GET_SEG;
+	} else if (isPattern(string, "movcr ")) {
+		*pos+=6;
+		return DIRECTIVE_MOV_CR;
+	} else if (isPattern(string, "getcr ")) {
+		*pos+=6;
+		return DIRECTIVE_GET_CR;
 	}
 
 	return DIRECTIVE_NULL;

@@ -434,10 +434,187 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				break;
 			case DIRECTIVE_CMOVZ:
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				if (arch != DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x44);
+				uint8_t modrm = 3 << 6;
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				modrm |= reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
 				break;
 			case DIRECTIVE_CMOVNZ:
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				if (arch != DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x45);
+				uint8_t modrm = 3 << 6;
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				modrm |= reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
 				break;
 			case DIRECTIVE_CMOVC:
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				if (arch != DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x42);
+				uint8_t modrm = 3 << 6;
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				modrm |= reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_IN:
+				char arch;
+				uint8_t opcode = 0xED;
+				assemble_reg(&text[pos], &pos, &arch);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				assemble_reg(&text[pos], &pos, &arch);
+				if (arch==8) {
+					opcode--;
+				} else if (arch!=DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, opcode);
+				break;
+			case DIRECTIVE_OUT:
+				char arch;
+				uint8_t opcode = 0xEF;
+				assemble_reg(&text[pos], &pos, &arch);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				assemble_reg(&text[pos], &pos, &arch);
+				if (arch==8) {
+					opcode--;
+				} else if (arch!=DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, opcode);	
+				break;
+			case DIRECTIVE_LGDT:
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x01);
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				uint8_t modrm = 2 << 3 | reg;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_LIDT:
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x01);
+				char arch;
+				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
+				uint8_t modrm = 3 << 3 | reg;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_JMP_FAR:
+				if (DEFAULT_ARCH!=32) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xEA);
+				size_t offset = getNum(&text[pos], &pos);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint16_t segment = (uint16_t)getNum(&text[pos], &pos);
+				for (int i=0;i<4;i++) {
+					streamAppendByte(outStream, (offset >> i*8) & 0xFF);
+				}
+				for (int i=0;i<2;i++) {
+					streamAppendByte(outStream, (segment >> i*8) & 0xFF);
+				}	
+				break;
+			case DIRECTIVE_JMP_FAR6:
+				if (DEFAULT_ARCH!=32) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0xEA);
+				uint16_t offset = (uint16_t)getNum(&text[pos], &pos);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint16_t segment = (uint16_t)getNum(&text[pos], &pos);
+				for (int i=0;i<2;i++) {
+					streamAppendByte(outStream, (offset >> i*8) & 0xFF);
+				}
+				for (int i=0;i<2;i++) {
+					streamAppendByte(outStream, (segment >> i*8) & 0xFF);
+				}
+				break;
+			case DIRECTIVE_MOV_SEG:
+				streamAppendByte(outStream, 0x8E);
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_GET_SEG:
+				streamAppendByte(outStream, 0x8C);
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
+				break;
+			case DIRECTIVE_MOV_CR:
+				uint8_t reg_a;
+				uint8_t reg_b;
+				char arch;
+				if (32!=DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				if (!(isPattern(&text[pos], "cr"))) {
+					// Error!
+					break;
+				} else {
+					pos+=2;
+					reg_a = text[pos++] - '0';
+					skipThese(text, &pos, " \t\n");
+					streamAppendByte(outStream, 0x0F);
+					streamAppendByte(outStream, 0x22);
+					reg_b = assemble_reg(&text[pos], &pos, &arch);
+				}
+				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
+				break;
+			case DIRECTIVE_GET_CR:
+				uint8_t reg_a;
+				uint8_t reg_b;
+				char arch;
+				if (32!=DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				reg_b = assemble_reg(&text[pos], &pos, &arch);
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				if (!(isPattern(&text[pos], "cr"))) {
+					// Error!
+					break;
+				} else {
+					pos+=2;
+					reg_a = text[pos] - '0';
+					streamAppendByte(outStream, 0x0F);
+					streamAppendByte(outStream, 0x22);
+					
+				}
+				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				break;
 			default: break;
 		}
@@ -530,6 +707,27 @@ uint8_t assemble_reg(char *text, size_t *pos, char *arch) {
 		*arch=8;
 		return ret;
 	}
+
+	if (isPattern(text, "es")) {
+		ret=0;
+	} else if (isPattern(text, "cs")) {
+		ret=1;
+	} else if (isPattern(text, "ss")) {
+		ret=2;
+	} else if (isPattern(text, "ds")) {
+		ret=3;
+	} else if (isPattern(text, "fs")) {
+		ret=4;
+	} else if (isPattern(text, "gs")) {
+		ret=5;
+	}
+
+	if (ret<100) {
+		*pos+=2;
+		*arch=16;
+		return ret;
+	}
+	return ret;
 }
 
 void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *pos) {
