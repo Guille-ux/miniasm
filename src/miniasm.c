@@ -28,7 +28,7 @@ void skipThese(char *text, size_t *pos, const char *list) {
 
 	while (1) {
 		found=false;
-		for (char *ch=list;ch!='\0';*ch++) {
+		for (char *ch=list;*ch!='\0';ch++) {
 			if (*ch==text[*pos]) {
 				found=true;
 				break;
@@ -89,7 +89,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 			case DIRECTIVE_DD:
 				handle_data_directive(outStream, cdir, &text[pos], &pos);
 				break;
-			case DIRECTIVE_MOVI:
+			case DIRECTIVE_MOVI: {
 				size_t n;
 				if (text[pos]=='M' || text[pos]=='N' || text[pos]=='L') {
 					char arch;
@@ -234,7 +234,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					}
 				}
 				break;
-			case DIRECTIVE_LABEL:
+					     }
+			case DIRECTIVE_LABEL: {
 				for (int i=0;i<rel_count;i++) {
 					size_t start_pos=pos;
 					skipUntilThese(text, &pos, ":");
@@ -246,7 +247,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					}
 				}
 				break;
-			case DIRECTIVE_LABELDEF:
+					      }
+			case DIRECTIVE_LABELDEF: {
 				RelocationSymbol *crel = &rel[rel_count++];
 				size_t start_pos = pos;
 				skipUntilThese(text, &pos, ":");
@@ -260,6 +262,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				crel->ready=false;
 				
 				break;
+						 }
 			case DIRECTIVE_ADD:
 				modrm_placeholder(0x01, outStream, text, &pos);
 				break;
@@ -330,12 +333,13 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 			case DIRECTIVE_HLT:
 				streamAppendByte(outStream, 0xF4);
 				break;
-			case DIRECTIVE_INT:
+			case DIRECTIVE_INT: {
 				size_t val = getNum(&text[pos], &pos);
 				streamAppendByte(outStream, 0xCD);
 				streamAppendByte(outStream, 0xFF & val);
 				break;
-			case DIRECTIVE_PUSH:
+					    }
+			case DIRECTIVE_PUSH: {
 				char arch;
 				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
 				if (DEFAULT_ARCH!=arch) {
@@ -343,7 +347,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				streamAppendByte(outStream, 0x50+reg);
 				break;
-			case DIRECTIVE_POP:
+					     }
+			case DIRECTIVE_POP: {
 				char arch;
 				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
 				if (DEFAULT_ARCH!=arch) {
@@ -351,7 +356,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				streamAppendByte(outStream, 0x58+reg);
 				break;
-			case DIRECTIVE_LOAX6:
+					    }
+			case DIRECTIVE_LOAX6: {
 				if (DEFAULT_ARCH!=16) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -362,7 +368,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				streamAppendByte(outStream, 0x00);
 				streamAppendByte(outStream, 0x00);
 				break;
-			case DIRECTIVE_LOAX:
+					      }
+			case DIRECTIVE_LOAX: {
 				if (DEFAULT_ARCH!=32) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -374,13 +381,15 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, 0x00);
 				}
 				break;
-			case DIRECTIVE_LOAX8:
+					     }
+			case DIRECTIVE_LOAX8: {
 				streamAppendByte(outStream, 0xB0+4);
 				size_t start = pos;
 				while (text[pos++]!=':');
 				newRelocationRequest(linking, outStream->size, 1, &text[start], start-pos);
 				streamAppendByte(outStream, 0x00);
 				break;
+					      }
 			case DIRECTIVE_POPA:
 				streamAppendByte(outStream, 0x61);
 				break;
@@ -393,7 +402,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 			case DIRECTIVE_IRET:
 				streamAppendByte(outStream, 0xCF);
 				break;
-			case DIRECTIVE_CALL:
+			case DIRECTIVE_CALL: {
 				char arch;
 				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
 				if (arch!= DEFAULT_ARCH) {
@@ -403,7 +412,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 6 | 2 << 3 | reg;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_JMP:
+					     }
+			case DIRECTIVE_JMP: {
 				char arch;
 				uint8_t reg = assemble_reg(&text[pos], &pos, &arch);
 				if (arch!= DEFAULT_ARCH) {
@@ -413,7 +423,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 6 | 4 << 3 | reg;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_RCALL:
+					    }
+			case DIRECTIVE_RCALL: {
 				if (DEFAULT_ARCH==16) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -423,7 +434,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, (n >> i*8) & 0xFF);
 				}	
 				break;
-			case DIRECTIVE_RJMP:
+					      }
+			case DIRECTIVE_RJMP: {
 				if (DEFAULT_ARCH==16) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -433,7 +445,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, (n >> i*8) & 0xFF);
 				}
 				break;
-			case DIRECTIVE_CMOVZ:
+					     }
+			case DIRECTIVE_CMOVZ: {
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
 				if (arch != DEFAULT_ARCH) {
@@ -448,7 +461,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				modrm |= reg_a << 3 | reg_b;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_CMOVNZ:
+					      }
+			case DIRECTIVE_CMOVNZ: {
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
 				if (arch != DEFAULT_ARCH) {
@@ -463,7 +477,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				modrm |= reg_a << 3 | reg_b;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_CMOVC:
+					       }
+			case DIRECTIVE_CMOVC: {
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
 				if (arch != DEFAULT_ARCH) {
@@ -478,7 +493,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				modrm |= reg_a << 3 | reg_b;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_IN:
+					      }
+			case DIRECTIVE_IN: {
 				char arch;
 				uint8_t opcode = 0xED;
 				assemble_reg(&text[pos], &pos, &arch);
@@ -492,7 +508,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				streamAppendByte(outStream, opcode);
 				break;
-			case DIRECTIVE_OUT:
+					   }
+			case DIRECTIVE_OUT: {
 				char arch;
 				uint8_t opcode = 0xEF;
 				assemble_reg(&text[pos], &pos, &arch);
@@ -506,7 +523,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				streamAppendByte(outStream, opcode);	
 				break;
-			case DIRECTIVE_LGDT:
+					    }
+			case DIRECTIVE_LGDT: {
 				streamAppendByte(outStream, 0x0F);
 				streamAppendByte(outStream, 0x01);
 				char arch;
@@ -514,7 +532,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 2 << 3 | reg;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_LIDT:
+					     }
+			case DIRECTIVE_LIDT: {
 				streamAppendByte(outStream, 0x0F);
 				streamAppendByte(outStream, 0x01);
 				char arch;
@@ -522,7 +541,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 3 | reg;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_JMP_FAR:
+					     }
+			case DIRECTIVE_JMP_FAR: {
 				if (DEFAULT_ARCH!=32) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -538,7 +558,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, (segment >> i*8) & 0xFF);
 				}	
 				break;
-			case DIRECTIVE_JMP_FAR6:
+						}
+			case DIRECTIVE_JMP_FAR6: {
 				if (DEFAULT_ARCH!=32) {
 					streamAppendByte(outStream, 0x66);
 				}
@@ -554,7 +575,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 					streamAppendByte(outStream, (segment >> i*8) & 0xFF);
 				}
 				break;
-			case DIRECTIVE_MOV_SEG:
+						 }
+			case DIRECTIVE_MOV_SEG: {
 				streamAppendByte(outStream, 0x8E);
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
@@ -564,7 +586,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_GET_SEG:
+						}
+			case DIRECTIVE_GET_SEG: {
 				streamAppendByte(outStream, 0x8C);
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
@@ -574,7 +597,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				streamAppendByte(outStream, modrm);
 				break;
-			case DIRECTIVE_MOV_CR:
+						}
+			case DIRECTIVE_MOV_CR: {
 				uint8_t reg_a;
 				uint8_t reg_b;
 				char arch;
@@ -594,7 +618,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				break;
-			case DIRECTIVE_GET_CR:
+		}
+			case DIRECTIVE_GET_CR: {
 				uint8_t reg_a;
 				uint8_t reg_b;
 				char arch;
@@ -616,6 +641,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				}
 				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				break;
+				}
 			default: break;
 		}
 
@@ -629,7 +655,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 
 	Symbol endSym;
 	endSym.type = SYM_END;
-	streamAppendByte(linking, (uint8_t*)&endSym, sizeof(Symbol));
+	streamAppendBytes(linking, (uint8_t*)&endSym, sizeof(Symbol));
 
 	return true;
 }

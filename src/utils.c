@@ -23,7 +23,7 @@ size_t getNum(const char *string, size_t *pos) {
 	if (isPattern(string, "0b")) {
 		val = atob(&string[*pos], pos);
 	} else if (isPattern(string, "0d")) {
-		val = atol(&string[*pos], pos);
+		val = matol(&string[*pos], pos);
 	} else if (isPattern(string, "0x")) {
 		val = atoh(&string[*pos], pos);
 	} else if (isPattern(string, "'")) {
@@ -50,7 +50,7 @@ size_t getNum(const char *string, size_t *pos) {
 	return val;
 }
 
-size_t atol(const char *string, size_t *pos) {
+size_t matol(const char *string, size_t *pos) {
 	size_t val=0;
 	int i=0;
 	while (string[i] <= '9' && string[i] >= '0') {
