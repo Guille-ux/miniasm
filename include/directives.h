@@ -2,6 +2,7 @@
 #define MINIASM_DIRECTIVES_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef enum {
 	DIRECTIVE_DB,

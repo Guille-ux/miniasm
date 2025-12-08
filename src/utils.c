@@ -27,21 +27,21 @@ size_t getNum(const char *string, size_t *pos) {
 	} else if (isPattern(string, "0x")) {
 		val = atoh(&string[*pos], pos);
 	} else if (isPattern(string, "'")) {
-		if (string[*pos]=='\') {
+		if (string[*pos]=='\\') {
 			*pos++;
 			if (string[*pos]=='n') {
 				val = '\n';
 				
 			} else if (string[*pos]=='t') {
 				val = '\t';
-			} else if (string[*pos]=='\') {
-				val = '\';
+			} else if (string[*pos]=='\\') {
+				val = '\\';
 			}
 		} else {
 			val = string[*pos];
 		}
 		*pos++;
-		if (string[*pos]!="'") {
+		if (string[*pos]!='\'') {
 			// Error!
 			return (size_t)-1;
 		}

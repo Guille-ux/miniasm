@@ -9,19 +9,19 @@ void mapRel2Sym(RelocationSymbol *rel, LinkerTable *table) {
 		free(table);
 		table = new_table;
 	}
-	table[table->count].id = rel->id;
-	table[table->count].value = rel->direction;
-	table[table->count].type = SYM_LABEL;
-	memcpy(table[table->count].name, rel->name, MAX_SYMBOL_NAME);
-	table[table->count].name[MAX_SYMBOL_NAME] = '\0';
-	table[table->count++].present = rel->ready;
+	table->sym_table[table->count].id = rel->id;
+	table->sym_table[table->count].value = rel->direction;
+	table->sym_table[table->count].type = SYM_LABEL;
+	memcpy(table->sym_table[table->count].name, rel->name, MAX_SYMBOL_NAME);
+	table->sym_table[table->count].name[MAX_SYMBOL_NAME] = '\0';
+	table->sym_table[table->count++].present = rel->ready;
 }
 
 
 void newRelocationRequest(ByteStream *stream, size_t pos, size_t size, const char *tag, size_t len) {
 	Symbol newSym;
 	newSym.size = size;
-	newSym.pos = pos;
+	newSym.value = pos;
 	newSym.type = SYM_RELOCATION_REQUEST;
 	memcpy(newSym.name, tag, (MAX_SYMBOL_NAME > len) ? len : MAX_SYMBOL_NAME);
 	newSym.name[(len < MAX_SYMBOL_NAME)? len : MAX_SYMBOL_NAME] = '\0';
