@@ -649,6 +649,7 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 	}
 
 	for (int i=0;i<rel_count;i++) {
+		appendRelocationSymbol(linking, &rel[i]);
 		free(rel[i].name);
 	}
 	free(rel);

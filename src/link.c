@@ -29,3 +29,15 @@ void newRelocationRequest(ByteStream *stream, size_t pos, size_t size, const cha
 	
 	streamAppendBytes(stream, (uint8_t*)&newSym, sizeof(Symbol));
 }
+
+void appendRelocationSymbol(ByteStream *stream, RelocationSymbol *rel) {
+	Symbol newSym;
+	newSym.present = rel->ready;
+	newSym.type = SYM_LABEL;
+	newSym.value = rel->direction;
+	newSym.size = 0;
+	memcpy(newSym.name, rel->name, 17);
+	newSym.name[17]='\0';
+	
+	streamAppendBytes(stream, (uint8_t*)&newSym, sizeof(Symbol));
+}
