@@ -20,6 +20,7 @@ void mapRel2Sym(RelocationSymbol *rel, LinkerTable *table) {
 
 void newRelocationRequest(ByteStream *stream, size_t pos, size_t size, const char *tag, size_t len) {
 	Symbol newSym;
+	newSym.present = false;
 	newSym.size = size;
 	newSym.value = pos;
 	newSym.type = SYM_RELOCATION_REQUEST;
