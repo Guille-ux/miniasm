@@ -28,7 +28,7 @@ size_t getNum(const char *string, size_t *pos) {
 		val = atoh(&string[*pos], pos);
 	} else if (isPattern(string, "'")) {
 		if (string[*pos]=='\\') {
-			*pos++;
+			(*pos)++;
 			if (string[*pos]=='n') {
 				val = '\n';
 				
@@ -40,7 +40,7 @@ size_t getNum(const char *string, size_t *pos) {
 		} else {
 			val = string[*pos];
 		}
-		*pos++;
+		(*pos)++;
 		if (string[*pos]!='\'') {
 			// Error!
 			return (size_t)-1;
@@ -57,7 +57,7 @@ size_t matol(const char *string, size_t *pos) {
 		val += string[i] - '0';
 		val *=10;
 		i++;
-		*pos++;
+		(*pos)++;
 	}
 	val /= 10;
 	return val;
@@ -70,7 +70,7 @@ size_t atoh(const char *string, size_t *pos) {
 		val += (string[i]>'9') ? string[i]-'0' :  string[i] - 'A' + 10;
 		val *=16;
 		i++;
-		*pos++;
+		(*pos)++;
 	}
 	val /= 16;
 	return val;

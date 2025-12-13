@@ -19,7 +19,7 @@ void skipUntilThese(char *text, size_t *pos, const char *list) {
 			break;
 		}
 
-		*pos++;
+		(*pos)++;
 	}
 }
 
@@ -40,7 +40,7 @@ void skipThese(char *text, size_t *pos, const char *list) {
 		if (text[*pos]=='\0') {
 			break;
 		}
-		*pos++;
+		(*pos)++;
 	}	
 }
 
@@ -768,7 +768,7 @@ void modrm_placeholder(uint8_t opcode, ByteStream *stream, char *text, size_t *p
 		streamAppendByte(stream, 0x66);
 	}
 	streamAppendByte(stream, opcode);	
-	*pos++;
+	(*pos)++;
 	skipThese(text, pos, " \t");
 	uint8_t b_reg_code = assemble_reg(&text[*pos], pos, &arch);
 	uint8_t modrm = 3 << 6;
@@ -803,7 +803,7 @@ void shift_placeholder(uint8_t extender, uint8_t opcode, ByteStream *stream, cha
 		streamAppendByte(stream, 0x66);
 	}
 	streamAppendByte(stream, opcode);	
-	*pos++;
+	(*pos)++;
 	skipThese(text, pos, " \t");
 	uint8_t modrm = 3 << 6;
 	modrm |= extender << 3;
