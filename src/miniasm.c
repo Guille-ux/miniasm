@@ -57,7 +57,8 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 	 *
 	 */
 
-	if(initStream(outStream)!=0) return false;
+	if (initStream(outStream)!=0) return false;
+	if (initStream(linking)!=0) return false;
 
 
 	directive cdir;
