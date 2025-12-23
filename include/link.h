@@ -21,7 +21,7 @@ typedef struct {
 	char *name;
 } RelocationSymbol;
 
-#define MAX_SYMBOL_NAME 17
+#define MAX_SYMBOL_NAME 33 // esto incluye '\0'
 
 typedef struct {
 	SymbolType type;
@@ -29,7 +29,7 @@ typedef struct {
 	size_t id;
 	size_t value; // dirección
 	bool present;
-	char name[17];
+	char name[MAX_SYMBOL_NAME];
 } __attribute__((packed)) Symbol;
 
 typedef struct {
