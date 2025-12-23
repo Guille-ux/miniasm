@@ -463,6 +463,38 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				streamAppendByte(outStream, modrm);
 				break;
 					      }
+			case DIRECTIVE_CMOVL: {
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				if (arch != DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x4C);
+				uint8_t modrm = 3 << 6;
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				modrm |= reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
+				break;
+					      }
+			case DIRECTIVE_CMOVG: {
+				char arch;
+				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
+				if (arch != DEFAULT_ARCH) {
+					streamAppendByte(outStream, 0x66);
+				}
+				streamAppendByte(outStream, 0x0F);
+				streamAppendByte(outStream, 0x4F);
+				uint8_t modrm = 3 << 6;
+				pos++;
+				skipThese(text, &pos, " \t\n");
+				uint8_t reg_b = assemble_reg(&text[pos], &pos, &arch);
+				modrm |= reg_a << 3 | reg_b;
+				streamAppendByte(outStream, modrm);
+				break;
+					      }
 			case DIRECTIVE_CMOVNZ: {
 				char arch;
 				uint8_t reg_a = assemble_reg(&text[pos], &pos, &arch);
