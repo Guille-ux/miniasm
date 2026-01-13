@@ -289,6 +289,13 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				modrm_placeholder(0x39, outStream, text, &pos);
 				break;
 			case DIRECTIVE_TIMES:	
+				size_t n_times = getNum(text, &pos);
+				skipThese(text, &pos, " \t");
+				size_t val_times = getNum(text, &pos);
+				void *val_arr = malloc(n_times);
+				memset(val_arr, val_times, n_times);
+				streamAppendBytes(outStream, val_arr, n_times);
+				free(val_arr);
 				break;
 			case DIRECTIVE_TIMES_SIZE:
 				break;
