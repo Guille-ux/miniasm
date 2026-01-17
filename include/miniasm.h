@@ -7,6 +7,7 @@
 
 #define DEFAULT_ARCH 32
 
+void rshift_placeholder(uint8_t extender, ByteStream *stream, char *text, size_t *pos);
 bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking);
 uint8_t assemble_reg(char *text, size_t *pos, char *arch);
 void skipUntilThese(char *text, size_t *pos, const char *list);

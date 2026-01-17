@@ -65,6 +65,9 @@ typedef enum {
 	DIRECTIVE_GET_CR,
 	DIRECTIVE_CMOVL,
 	DIRECTIVE_CMOVG,
+	DIRECTIVE_RSHR,
+	DIRECTIVE_RSHL,
+	DIRECTIVE_RSAR,
 } directive;
 
 directive WtfDirectiveIs(const char *string, size_t *pos);

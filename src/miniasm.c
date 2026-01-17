@@ -682,6 +682,15 @@ bool assemble_text(ByteStream *outStream, const char *otext, ByteStream *linking
 				uint8_t modrm = 3 << 6 | reg_a << 3 | reg_b;
 				break;
 				}
+			case DIRECTIVE_RSHR:
+				rshift_placeholder(5, outStream, text, &pos);
+				break;
+			case DIRECTIVE_RSHL:
+				rshift_placeholder(4, outStream, text, &pos);
+				break;
+			case DIRECTIVE_RSAR:
+				rshift_placeholder(6, outStream, text, &pos);
+				break;
 			default: break;
 		}
 
@@ -849,4 +858,22 @@ void shift_placeholder(uint8_t extender, uint8_t opcode, ByteStream *stream, cha
 	modrm |= a_reg_code;	
 	streamAppendByte(stream, modrm);
 	streamAppendByte(stream, getNum(&text[*pos], pos));
+}
+
+void rshift_placeholder(uint8_t extender, ByteStream *stream, char *text, size_t *pos) {
+	uint8_t opcode = 0xD3;
+	char arch;
+	uint8_t a_reg_code = assemble_reg(&text[*pos], pos, &arch);
+	if (arch==8) {
+		opcode--;
+	} else if (arch!=DEFAULT_ARCH) {
+		streamAppendByte(stream, 0x66);
+	}
+	streamAppendByte(stream, opcode);	
+	(*pos)++;
+	skipThese(text, pos, " \t");
+	uint8_t modrm = 3 << 6;
+	modrm |= extender << 3;
+	modrm |= a_reg_code;	
+	streamAppendByte(stream, modrm);
 }

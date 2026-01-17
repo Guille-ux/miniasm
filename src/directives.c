@@ -191,6 +191,15 @@ directive WtfDirectiveIs(const char *string, size_t *pos) {
 	} else if (isPattern(string, "getcr ")) {
 		*pos+=6;
 		return DIRECTIVE_GET_CR;
+	} else if (isPattern(string, "rshr ")) {
+		*pos+=5;
+		return DIRECTIVE_RSHR;
+	} else if (isPattern(string, "rshl ")) {
+		*pos+=5;
+		return DIRECTIVE_RSHL;
+	} else if (isPattern(string, "rsar ")) {
+		*pos+=5;
+		return DIRECTIVE_RSAR;
 	}
 
 	return DIRECTIVE_NULL;
