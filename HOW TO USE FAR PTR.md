@@ -1,0 +1,13 @@
+# List with Prefixes for every far segment
+
+- CS: 0x2E
+
+- SS: 0x36
+
+- DS: 0x3E
+
+- ES: 0x26
+
+- FS: 0x64
+
+- GS: 0x65
